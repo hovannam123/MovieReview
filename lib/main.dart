@@ -12,7 +12,7 @@ import 'package:the_movie/provider/similarProvider.dart';
 import 'package:the_movie/test.dart';
 import 'modules/login.dart';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 

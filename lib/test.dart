@@ -1,45 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:provider/provider.dart';
-import 'package:the_movie/config/app_text_style.dart';
-import 'package:the_movie/provider/genresProvider.dart';
-import 'package:the_movie/provider/movieProvider.dart';
-import 'package:the_movie/provider/moviedetailProvider.dart';
-import 'package:the_movie/provider/searchProvider.dart';
+import 'dart:convert';
 
-import 'api/movieApiProvider.dart';
-import 'model/movie.dart';
+import 'package:http/http.dart' as http;
 
-class Test extends StatefulWidget {
-  const Test({super.key});
+Future<String?> getSessionId(
+    String apiKey, String username, String password) async {
+  final requestTokenResponse = await http.post(
+    Uri.parse('https://api.themoviedb.org/3/authentication/token/new'),
+    body: {'api_key': apiKey},
+  );
 
-  @override
-  State<Test> createState() => _TestState();
-}
+  final requestToken = jsonDecode(requestTokenResponse.body)['request_token'];
 
-class _TestState extends State<Test> {
-  late List<Results>? search = [];
-  final movieApiRequest = MovieApiRequest();
+  final validateRequestTokenResponse = await http.post(
+    Uri.parse(
+        'https://api.themoviedb.org/3/authentication/token/validate_with_login'),
+    body: {
+      'api_key': apiKey,
+      'username': username,
+      'password': password,
+      'request_token': requestToken,
+    },
+  );
 
-  @override
-  void initState() {
-    super.initState();
-    // Provider.of<GenresProvider>(context, listen: false).getGenres();
-    // Provider.of<MovieDetailProvider>(context).getDetail();
-  }
+  final sessionIdResponse = await http.post(
+    Uri.parse('https://api.themoviedb.org/3/authentication/session/new'),
+    body: {'api_key': apiKey, 'request_token': requestToken},
+  );
 
-  getData() async {
-    await movieApiRequest.search('shot').then((value) {
-      setState(() {
-        search = value;
-      });
-    });
-  }
+  final sessionId = jsonDecode(sessionIdResponse.body)['session_id'];
 
-  @override
-  Widget build(BuildContext context) {
-    final data = Provider.of<MovieDetailProvider>(context);
-    return Scaffold(body: Center(child: Text('${data.details.title}')));
-  }
+  return sessionId;
 }

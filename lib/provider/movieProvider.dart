@@ -34,7 +34,6 @@ class MovieProvider with ChangeNotifier {
   }
 
   void getMovieComingSoon() async {
-    _isLoad = true;
     List<Results> loadingResult = [];
     await movieApiProvider.fecthMovieUpcoming().then((movie) => {
           movie.results?.forEach((result) {
@@ -42,12 +41,10 @@ class MovieProvider with ChangeNotifier {
           })
         });
     _MovieComingSoonList = loadingResult;
-    _isLoad = false;
     notifyListeners();
   }
 
   void getTopMovie() async {
-    _isLoad = true;
     List<Results> loadingResult = [];
     await movieApiProvider.fecthTopMovie().then((movie) => {
           movie.results?.forEach((result) {
@@ -55,7 +52,6 @@ class MovieProvider with ChangeNotifier {
           })
         });
     _TopMovieList = loadingResult;
-    _isLoad = false;
     notifyListeners();
   }
 }

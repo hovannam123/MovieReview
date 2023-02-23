@@ -24,6 +24,7 @@ class MovieDetailModel {
   bool? video;
   double? voteAverage;
   int? voteCount;
+  Videos? videos;
 
   MovieDetailModel(
       {this.adult,
@@ -50,7 +51,8 @@ class MovieDetailModel {
       this.title,
       this.video,
       this.voteAverage,
-      this.voteCount});
+      this.voteCount,
+      this.videos});
 
   MovieDetailModel.fromJson(Map<String, dynamic> json) {
     adult = json['adult'];
@@ -100,6 +102,8 @@ class MovieDetailModel {
     video = json['video'];
     voteAverage = json['vote_average'];
     voteCount = json['vote_count'];
+    videos =
+        json['videos'] != null ? new Videos.fromJson(json['videos']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -142,6 +146,9 @@ class MovieDetailModel {
     data['video'] = this.video;
     data['vote_average'] = this.voteAverage;
     data['vote_count'] = this.voteCount;
+    if (this.videos != null) {
+      data['videos'] = this.videos!.toJson();
+    }
     return data;
   }
 }
@@ -252,6 +259,82 @@ class SpokenLanguages {
     data['english_name'] = this.englishName;
     data['iso_639_1'] = this.iso6391;
     data['name'] = this.name;
+    return data;
+  }
+}
+
+class Videos {
+  List<VideoKey>? results;
+
+  Videos({this.results});
+
+  Videos.fromJson(Map<String, dynamic> json) {
+    if (json['results'] != null) {
+      results = <VideoKey>[];
+      json['results'].forEach((v) {
+        results!.add(new VideoKey.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.results != null) {
+      data['results'] = this.results!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class VideoKey {
+  String? iso6391;
+  String? iso31661;
+  String? name;
+  String? key;
+  String? site;
+  int? size;
+  String? type;
+  bool? official;
+  String? publishedAt;
+  String? id;
+
+  VideoKey(
+      {this.iso6391,
+      this.iso31661,
+      this.name,
+      this.key,
+      this.site,
+      this.size,
+      this.type,
+      this.official,
+      this.publishedAt,
+      this.id});
+
+  VideoKey.fromJson(Map<String, dynamic> json) {
+    iso6391 = json['iso_639_1'];
+    iso31661 = json['iso_3166_1'];
+    name = json['name'];
+    key = json['key'];
+    site = json['site'];
+    size = json['size'];
+    type = json['type'];
+    official = json['official'];
+    publishedAt = json['published_at'];
+    id = json['id'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['iso_639_1'] = this.iso6391;
+    data['iso_3166_1'] = this.iso31661;
+    data['name'] = this.name;
+    data['key'] = this.key;
+    data['site'] = this.site;
+    data['size'] = this.size;
+    data['type'] = this.type;
+    data['official'] = this.official;
+    data['published_at'] = this.publishedAt;
+    data['id'] = this.id;
     return data;
   }
 }

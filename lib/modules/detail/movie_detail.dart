@@ -12,7 +12,7 @@ import 'package:the_movie/modules/home/components/slider_top_movie.dart';
 import 'package:the_movie/provider/moviedetailProvider.dart';
 import 'package:the_movie/provider/reviewProvider.dart';
 import 'package:the_movie/provider/similarProvider.dart';
-
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'components/arrow_back.dart';
 import 'components/background_widget.dart';
 import 'package:http/http.dart' as http;
@@ -35,19 +35,12 @@ class _MovieDetailState extends State<MovieDetail>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
-  String getImageUrl(int index) {
-    final reviewsProvider = Provider.of<ReviewProvider>(context);
-    String url = '';
-    if (isLoadImage == false) {
-      url = 'https://images.unsplash.com/photo-1547721064-da6cfb341d50';
-    } else {
-      url =
-          'https://image.tmdb.org/t/p/original/${reviewsProvider.reviews[index].authorDetails.avatarPath}';
-    }
-    return url;
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -123,18 +116,26 @@ class _MovieDetailState extends State<MovieDetail>
                                     padding:
                                         EdgeInsets.only(left: 8, bottom: 8),
                                     child: Text(
-                                      'Genres:${movieDetailsProvider.details.genres![0].name}',
+                                      'Language: ${movieDetailsProvider.details.originalLanguage}',
                                       style: AppTextStyle.heading4Light,
                                     ),
                                   ),
                                   Container(
                                     padding:
                                         EdgeInsets.only(left: 8, bottom: 8),
-                                    child: Text(
-                                      'Language: ${movieDetailsProvider.details.originalLanguage}',
-                                      style: AppTextStyle.heading4Light,
+                                    child: Wrap(
+                                      children: [
+                                        Text('Genres: '),
+                                        Wrap(
+                                            children: movieDetailsProvider
+                                                .details.genres
+                                                .map<Widget>((e) => Text(
+                                                      '${e.name}, ',
+                                                    ))
+                                                .toList()),
+                                      ],
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             )
@@ -157,6 +158,9 @@ class _MovieDetailState extends State<MovieDetail>
                                   Tab(
                                     text: 'Review',
                                   ),
+                                  Tab(
+                                    text: 'Trailer',
+                                  ),
                                 ],
                                 controller: _tabController,
                                 labelStyle: AppTextStyle.heading3Medium,
@@ -178,7 +182,7 @@ class _MovieDetailState extends State<MovieDetail>
                                     ),
                                   ),
                                   reviewsProvider.reviews.length == 0
-                                      ? Center(
+                                      ? const Center(
                                           child: Text('Have no review'),
                                         )
                                       : Container(
@@ -200,34 +204,10 @@ class _MovieDetailState extends State<MovieDetail>
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      // Container(
-                                                      //   width: 50,
-                                                      //   height: 50,
-                                                      //   padding:
-                                                      //       EdgeInsets.only(
-                                                      //           top: 8,
-                                                      //           left: 8),
-                                                      //   decoration:
-                                                      //       BoxDecoration(
-                                                      //     image:
-                                                      //         DecorationImage(
-                                                      //       onError: (exception, stackTrace) => print(exception
-                                                      //       ),
-                                                      //       image: NetworkImage(
-                                                      //         getImageUrl(
-                                                      //             index),
-                                                      //       ),
-                                                      //     ), //Border.all
-                                                      //     borderRadius:
-                                                      //         BorderRadius.all(
-                                                      //       Radius.circular(30),
-                                                      //     ), //BorderRadius.all
-                                                      //   ), //BoxDecoration
-                                                      // ),
-
                                                       Container(
                                                         padding:
-                                                            EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                    .only(
                                                                 left: 8,
                                                                 top: 8),
                                                         width: 50,
@@ -250,7 +230,7 @@ class _MovieDetailState extends State<MovieDetail>
                                                           ),
                                                         ),
                                                       ),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 20,
                                                       ),
                                                       Expanded(
@@ -275,7 +255,7 @@ class _MovieDetailState extends State<MovieDetail>
                                                                     TextAlign
                                                                         .left,
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 height: 10,
                                                               )
                                                             ],
@@ -286,7 +266,21 @@ class _MovieDetailState extends State<MovieDetail>
                                               );
                                             },
                                           ),
-                                        )
+                                        ),
+                                  YoutubePlayer(
+                                    controller: YoutubePlayerController(
+                                      initialVideoId:
+                                          '${movieDetailsProvider.details.videos.results.last.key}',
+                                      flags: YoutubePlayerFlags(
+                                        autoPlay: false,
+                                      ),
+                                    ),
+                                    showVideoProgressIndicator: true,
+                                    progressColors: ProgressBarColors(
+                                      playedColor: Colors.red,
+                                      handleColor: Colors.grey,
+                                    ),
+                                  ),
                                 ],
                               ),
                             )

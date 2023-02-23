@@ -91,7 +91,7 @@ class MovieApiRequest {
 
   Future<MovieDetailModel> movieDetail(int id) async {
     final response = await http.get(Uri.parse(
-        'https://api.themoviedb.org/3/movie/$id?api_key=$_apiKey&language=en-US'));
+        'https://api.themoviedb.org/3/movie/$id?api_key=$_apiKey&language=en-US&append_to_response=videos'));
     if (response.statusCode == 200) {
       return MovieDetailModel.fromJson(json.decode(response.body));
     } else {

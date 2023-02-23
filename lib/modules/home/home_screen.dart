@@ -38,43 +38,33 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late List<Results> testList = [];
   final MovieApiRequest _api = MovieApiRequest();
+  final movieBloc = MovieBloc();
+
   @override
   void initState() {
     Provider.of<MovieProvider>(context, listen: false).getMovieNowPlaying();
     Provider.of<MovieProvider>(context, listen: false).getMovieComingSoon();
     Provider.of<MovieProvider>(context, listen: false).getTopMovie();
     Provider.of<GenresProvider>(context, listen: false).getGenres();
-
-    _api.search('shot').then((value) => {
-          setState(() {
-            testList = value;
-          })
-        });
-
+    movieBloc.fetchTopMovie();
     super.initState();
   }
 
-  List<Widget> getImages() {
-    final movieData = Provider.of<MovieProvider>(context);
-    List<Widget> img = [];
-    movieData.MovieComingSoonList.forEach((result) {
-      img.add(Image.network(
-        'https://image.tmdb.org/t/p/w500/${result.posterPath}',
-      ));
-    });
-    return img;
+  Padding buildText(String txt) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+      child: Text(
+        txt,
+        style: AppTextStyle.heading2,
+      ),
+    );
   }
 
-  List<String> getTittles() {
-    final movieData = Provider.of<MovieProvider>(context);
-    List<String> tittles = [];
-    movieData.MovieComingSoonList.forEach((result) {
-      tittles.add(result.title.toString());
-    });
-    return tittles;
+  @override
+  void dispose() {
+    movieBloc.dispose();
+    super.dispose();
   }
-
-  getIdMovieDetail() {}
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final movieDetailsProvider = Provider.of<MovieDetailProvider>(context);
     final movieSimilarProvider = Provider.of<MovieSimilarProvider>(context);
     final Size size = MediaQuery.of(context).size;
-    final bloc = MovieBloc();
     return Scaffold(
         body: movieProvider.isLoad
             ? const Center(
@@ -113,8 +102,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               (item) => Image.network(
                                     'https://image.tmdb.org/t/p/w500/${item.posterPath}',
                                   )).toList(),
-                          titles: movieProvider.MovieComingSoonList.map<String>(
-                              (item) => '${item.title}').toList(),
                           displayOnlyCenterTitle: true,
                           onCenterItemSelected: (index) {
                             movieDetailsProvider.getDetail(
@@ -138,30 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    // Consumer<SearchProvider>(
-                    //   builder: (context, value, child) {
-                    //     if (value.results.isEmpty) {
-                    //       return CircularProgressIndicator();
-                    //     } else {
-                    //       return SliderTopMovie(
-                    //         size: size,
-                    //         resultsTopMovie: value.results,
-                    //       );
-                    //     }
-                    //   },
-                    // )
                   ],
                 ),
               ));
-  }
-
-  Padding buildText(String txt) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 24),
-      child: Text(
-        txt,
-        style: AppTextStyle.heading2,
-      ),
-    );
   }
 }
